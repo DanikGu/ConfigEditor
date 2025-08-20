@@ -1,9 +1,8 @@
-
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 
 // --- Helper Icons ---
 const ChevronDown = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6" /></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 BORDER_1 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6" /></svg>
 );
 
 const ChevronRight = () => (
@@ -18,81 +17,15 @@ const Trash2 = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-trash-2"><path d="M3 6h18" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /><line x1="10" x2="10" y1="11" y2="17" /><line x1="14" x2="14" y1="11" y2="17" /></svg>
 );
 
+const ChevronsDownUp = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevrons-down-up"><path d="m7 20 5-5 5 5" /><path d="m7 4 5 5 5-5" /></svg>
+);
+
 
 // --- Initial Data ---
 const initialConfig = {
   "909310000": {
     "JobTypeName": "Tax - 1040 Individual",
-    "Sureprep.Binder": true,
-    "Sureprep.Dreamworkpapers": true,
-    "Sureprep.UploadedDocumentsCount": true,
-    "Box.LinkValidation": true,
-    "Box.WorkapaperTemplate": true,
-    "Pe.NicheToXcm": true,
-    "GOS.UpdateDeliverablesStatesResidency": true,
-    "GOS.UpdateDiagnostics": true,
-    "GOS.UpdateFederalBalances": true,
-    "GOS.RegenerateGoSDRL": true,
-    "GOS.RegenerateGoSEfile": true,
-    "Email.EfileConditionallyAccepted": true,
-    "Email.EfileRejectedReminder": true,
-    "Locations": {
-      "875790027": {
-        "LocationNameText": "Gateway",
-        "Email.EfileAcceptedReminder": true
-      },
-      "875790032": {
-        "LocationNameText": "Nashville",
-        "Sureprep.Binder": false,
-        "Sureprep.Dreamworkpapers": false,
-        "Sureprep.UploadedDocumentsCount": false,
-        "Box.LinkValidation": false,
-        "GOS.UpdateDeliverablesStatesResidency": false,
-        "GOS.UpdateDiagnostics": false,
-        "GOS.UpdateFederalBalances": false,
-        "GOS.RegenerateGoSDRL": false,
-        "Email.EfileConditionallyAccepted": false,
-        "Email.EfileRejectedReminder": false
-      }
-    }
-  },
-  "875790000": {
-    "JobTypeName": "1040-Taxpayer Abroad",
-    "Sureprep.Binder": true,
-    "Sureprep.Dreamworkpapers": true,
-    "Sureprep.UploadedDocumentsCount": true,
-    "Box.LinkValidation": true,
-    "Box.WorkapaperTemplate": true,
-    "Pe.NicheToXcm": true,
-    "GOS.UpdateDeliverablesStatesResidency": true,
-    "GOS.UpdateDiagnostics": true,
-    "GOS.UpdateFederalBalances": true,
-    "GOS.RegenerateGoSDRL": true,
-    "GOS.RegenerateGoSEfile": true,
-    "Email.EfileConditionallyAccepted": true,
-    "Email.EfileRejectedReminder": true,
-    "Locations": {
-      "875790027": {
-        "LocationNameText": "Gateway",
-        "Email.EfileAcceptedReminder": true
-      },
-      "875790032": {
-        "LocationNameText": "Nashville",
-        "Sureprep.Binder": false,
-        "Sureprep.Dreamworkpapers": false,
-        "Sureprep.UploadedDocumentsCount": false,
-        "Box.LinkValidation": false,
-        "GOS.UpdateDeliverablesStatesResidency": false,
-        "GOS.UpdateDiagnostics": false,
-        "GOS.UpdateFederalBalances": false,
-        "GOS.RegenerateGoSDRL": false,
-        "Email.EfileConditionallyAccepted": false,
-        "Email.EfileRejectedReminder": false
-      }
-    }
-  },
-  "875790001": {
-    "JobTypeName": "Tax - 1040 NR NonResident",
     "Sureprep.Binder": true,
     "Sureprep.Dreamworkpapers": true,
     "Sureprep.UploadedDocumentsCount": true,
@@ -149,106 +82,6 @@ const initialConfig = {
       }
     }
   },
-  "909310002": {
-    "JobTypeName": "Tax - 1120 S Corporation",
-    "Box.WorkapaperTemplate": true,
-    "Pe.NicheToXcm": true,
-    "GOS.UpdateDeliverablesStatesResidency": true,
-    "GOS.UpdateDiagnostics": true,
-    "GOS.RegenerateGoSEfile": true,
-    "Email.EfileConditionallyAccepted": true,
-    "Email.EfileRejectedReminder": true,
-    "Locations": {
-      "875790027": {
-        "LocationNameText": "Gateway",
-        "Email.EfileAcceptedReminder": true
-      },
-      "875790032": {
-        "LocationNameText": "Nashville",
-        "GOS.UpdateDeliverablesStatesResidency": false,
-        "GOS.UpdateDiagnostics": false,
-        "Email.EfileConditionallyAccepted": false,
-        "Email.EfileRejectedReminder": false
-      }
-    }
-  },
-  "909310003": {
-    "JobTypeName": "1120 Estimates",
-    "Box.WorkapaperTemplate": true,
-    "Pe.NicheToXcm": true,
-    "GOS.UpdateDeliverablesStatesResidency": true,
-    "GOS.UpdateDiagnostics": true,
-    "GOS.RegenerateGoSEfile": true,
-    "Email.EfileConditionallyAccepted": true,
-    "Email.EfileRejectedReminder": true,
-    "Locations": {
-      "875790027": {
-        "LocationNameText": "Gateway",
-        "Email.EfileAcceptedReminder": true
-      },
-      "875790032": {
-        "LocationNameText": "Nashville",
-        "GOS.UpdateDeliverablesStatesResidency": false,
-        "GOS.UpdateDiagnostics": false,
-        "Email.EfileConditionallyAccepted": false,
-        "Email.EfileRejectedReminder": false
-      }
-    }
-  },
-  "909310004": {
-    "JobTypeName": "1120H US Income T/R Home",
-    "Box.WorkapaperTemplate": true,
-    "Pe.NicheToXcm": true,
-    "GOS.UpdateDeliverablesStatesResidency": true,
-    "GOS.UpdateDiagnostics": true,
-    "GOS.RegenerateGoSEfile": true,
-    "Email.EfileConditionallyAccepted": true,
-    "Email.EfileRejectedReminder": true,
-    "Locations": {
-      "875790027": {
-        "LocationNameText": "Gateway",
-        "Email.EfileAcceptedReminder": true
-      },
-      "875790032": {
-        "LocationNameText": "Nashville",
-        "GOS.UpdateDeliverablesStatesResidency": false,
-        "GOS.UpdateDiagnostics": false,
-        "Email.EfileConditionallyAccepted": false,
-        "Email.EfileRejectedReminder": false
-      }
-    }
-  },
-  "875790002": {
-    "JobTypeName": "Tax - 1041 Fiduciary",
-    "Sureprep.Binder": true,
-    "Sureprep.Dreamworkpapers": true,
-    "Sureprep.UploadedDocumentsCount": true,
-    "Box.LinkValidation": true,
-    "Box.WorkapaperTemplate": true,
-    "Pe.NicheToXcm": true,
-    "GOS.UpdateDeliverablesStatesResidency": true,
-    "GOS.UpdateDiagnostics": true,
-    "GOS.RegenerateGoSEfile": true,
-    "Email.EfileConditionallyAccepted": true,
-    "Email.EfileRejectedReminder": true,
-    "Locations": {
-      "875790027": {
-        "LocationNameText": "Gateway",
-        "Email.EfileAcceptedReminder": true
-      },
-      "875790032": {
-        "LocationNameText": "Nashville",
-        "Sureprep.Binder": false,
-        "Sureprep.Dreamworkpapers": false,
-        "Sureprep.UploadedDocumentsCount": false,
-        "Box.LinkValidation": false,
-        "GOS.UpdateDeliverablesStatesResidency": false,
-        "GOS.UpdateDiagnostics": false,
-        "Email.EfileConditionallyAccepted": false,
-        "Email.EfileRejectedReminder": false
-      }
-    }
-  },
   "875790003": {
     "JobTypeName": "Tax - 1065 Partnership",
     "Box.LinkValidation": true,
@@ -265,110 +98,9 @@ const initialConfig = {
       },
       "875790032": {
         "LocationNameText": "Nashville",
-        "GOS.UpdateDeliverablesStatesResidency": false,
-        "GOS.UpdateDiagnostics": false,
-        "Email.EfileConditionallyAccepted": false,
-        "Email.EfileRejectedReminder": false
       }
     }
   },
-  "875790004": {
-    "JobTypeName": "Tax - 5500 Retirement",
-    "Sureprep.Binder": true,
-    "Sureprep.Dreamworkpapers": true,
-    "Sureprep.UploadedDocumentsCount": true,
-    "Box.LinkValidation": true,
-    "Box.WorkapaperTemplate": true,
-    "Pe.NicheToXcm": true,
-    "GOS.UpdateDeliverablesStatesResidency": true,
-    "GOS.UpdateDiagnostics": true,
-    "GOS.UpdateFederalBalances": true,
-    "GOS.RegenerateGoSDRL": true,
-    "GOS.RegenerateGoSEfile": true,
-    "Email.EfileConditionallyAccepted": true,
-    "Email.EfileRejectedReminder": true,
-    "Locations": {
-      "875790027": {
-        "LocationNameText": "Gateway",
-        "Email.EfileAcceptedReminder": true
-      },
-      "875790032": {
-        "LocationNameText": "Nashville",
-        "Sureprep.Binder": false,
-        "Sureprep.Dreamworkpapers": false,
-        "Sureprep.UploadedDocumentsCount": false,
-        "Box.LinkValidation": false,
-        "GOS.UpdateDeliverablesStatesResidency": false,
-        "GOS.UpdateDiagnostics": false,
-        "GOS.UpdateFederalBalances": false,
-        "GOS.RegenerateGoSDRL": false,
-        "Email.EfileConditionallyAccepted": false,
-        "Email.EfileRejectedReminder": false
-      }
-    }
-  },
-  "875790005": {
-    "JobTypeName": "Tax - 709 Gift Tax",
-    "Sureprep.Binder": true,
-    "Sureprep.Dreamworkpapers": true,
-    "Sureprep.UploadedDocumentsCount": true,
-    "Box.LinkValidation": true,
-    "Box.WorkapaperTemplate": true,
-    "Pe.NicheToXcm": true,
-    "GOS.UpdateDeliverablesStatesResidency": true,
-    "GOS.UpdateDiagnostics": true,
-    "GOS.RegenerateGoSEfile": true,
-    "Email.EfileConditionallyAccepted": true,
-    "Email.EfileRejectedReminder": true,
-    "Locations": {
-      "875790027": {
-        "LocationNameText": "Gateway",
-        "Email.EfileAcceptedReminder": true
-      },
-      "875790032": {
-        "LocationNameText": "Nashville",
-        "Sureprep.Binder": false,
-        "Sureprep.Dreamworkpapers": false,
-        "Sureprep.UploadedDocumentsCount": false,
-        "Box.LinkValidation": false,
-        "GOS.UpdateDeliverablesStatesResidency": false,
-        "GOS.UpdateDiagnostics": false,
-        "Email.EfileConditionallyAccepted": false,
-        "Email.EfileRejectedReminder": false
-      }
-    }
-  },
-  "875790006": {
-    "JobTypeName": "Tax - 990 Tax Exempt",
-    "Sureprep.Binder": true,
-    "Sureprep.Dreamworkpapers": true,
-    "Sureprep.UploadedDocumentsCount": true,
-    "Box.LinkValidation": true,
-    "Box.WorkapaperTemplate": true,
-    "Pe.NicheToXcm": true,
-    "GOS.UpdateDeliverablesStatesResidency": true,
-    "GOS.UpdateDiagnostics": true,
-    "GOS.RegenerateGoSEfile": true,
-    "Email.EfileConditionallyAccepted": true,
-    "Email.EfileRejectedReminder": true,
-    "Locations": {
-      "875790027": {
-        "LocationNameText": "Gateway",
-        "Email.EfileAcceptedReminder": true
-      },
-      "875790032": {
-        "LocationNameText": "Nashville",
-        "Sureprep.Binder": false,
-        "Sureprep.Dreamworkpapers": false,
-        "Sureprep.UploadedDocumentsCount": false,
-        "Box.LinkValidation": false,
-        "GOS.UpdateDeliverablesStatesResidency": false,
-        "GOS.UpdateDiagnostics": false,
-        "Email.EfileConditionallyAccepted": false,
-        "Email.EfileRejectedReminder": false
-      }
-    }
-  }
 };
 
 const locationMap = {
@@ -379,7 +111,6 @@ const locationMap = {
 
 const locationIds = ['875790027', '875790032'];
 
-// Function to extract all unique feature keys from a configuration object
 const getFeaturesFromConfig = (config) => {
   const featureSet = new Set();
   Object.values(config).forEach(jobData => {
@@ -401,7 +132,6 @@ const getFeaturesFromConfig = (config) => {
   return Array.from(featureSet).sort();
 };
 
-// Function to format the config object for display, ensuring 'Locations' is the last key.
 const formatConfigForDisplay = (configObj) => {
   const sortedConfig = {};
   for (const jobId in configObj) {
@@ -418,7 +148,6 @@ const formatConfigForDisplay = (configObj) => {
 };
 
 
-// --- Main App Component ---
 export default function App() {
   const [config, setConfig] = useState(initialConfig);
   const [features, setFeatures] = useState(() => getFeaturesFromConfig(initialConfig));
@@ -429,7 +158,6 @@ export default function App() {
   const [jsonError, setJsonError] = useState('');
   const [featureToDelete, setFeatureToDelete] = useState(null);
 
-  // Memoize job types as they only change if the config structure changes
   const jobTypes = useMemo(() => {
     return Object.entries(config).map(([jobId, jobData]) => ({
       id: jobId,
@@ -437,7 +165,11 @@ export default function App() {
     }));
   }, [config]);
 
-  // Update the features list whenever the main config is updated
+  const areAllExpanded = useMemo(() => {
+    if (jobTypes.length === 0) return false;
+    return jobTypes.every(job => expandedJobTypes[job.id]);
+  }, [expandedJobTypes, jobTypes]);
+
   useEffect(() => {
     const newFeatures = getFeaturesFromConfig(config);
     setFeatures(currentFeatures => {
@@ -451,36 +183,25 @@ export default function App() {
     if (trimmedName && !features.includes(trimmedName)) {
       setFeatures(prevFeatures => [...prevFeatures, trimmedName].sort());
       setNewFeatureName('');
-    } else if (features.includes(trimmedName)) {
-      console.warn(`Feature "${trimmedName}" already exists.`);
     }
   };
 
   const handleDeleteFeature = (featureNameToDelete) => {
-    // Remove from the features list in the UI
     setFeatures(prevFeatures => prevFeatures.filter(f => f !== featureNameToDelete));
-
-    // Remove from the config JSON
     setConfig(currentConfig => {
       const newConfig = JSON.parse(JSON.stringify(currentConfig));
       for (const jobId in newConfig) {
-        if (newConfig[jobId][featureNameToDelete]) {
-          delete newConfig[jobId][featureNameToDelete];
-        }
+        delete newConfig[jobId][featureNameToDelete];
         if (newConfig[jobId].Locations) {
           for (const locId in newConfig[jobId].Locations) {
-            if (newConfig[jobId].Locations[locId][featureNameToDelete]) {
-              delete newConfig[jobId].Locations[locId][featureNameToDelete];
-            }
+            delete newConfig[jobId].Locations[locId][featureNameToDelete];
           }
         }
       }
       return newConfig;
     });
-
-    setFeatureToDelete(null); // Close confirmation modal
+    setFeatureToDelete(null);
   };
-
 
   const handleOpenJsonPopup = () => {
     const formattedConfig = formatConfigForDisplay(config);
@@ -496,8 +217,16 @@ export default function App() {
       setIsJsonVisible(false);
     } catch (error) {
       setJsonError('Invalid JSON format. Please check your syntax.');
-      console.error("JSON parsing error:", error);
     }
+  };
+
+  const toggleAllJobTypesExpansion = () => {
+    const nextState = !areAllExpanded;
+    const newExpandedState = {};
+    jobTypes.forEach(job => {
+      newExpandedState[job.id] = nextState;
+    });
+    setExpandedJobTypes(newExpandedState);
   };
 
   const toggleJobTypeExpansion = (jobId) => {
@@ -507,31 +236,21 @@ export default function App() {
   const getFeatureStateForLocation = useCallback((feature, jobId, locationId) => {
     const jobData = config[jobId];
     if (!jobData) return false;
-
     const jobLevelStatus = jobData[feature] === true;
-
-    if (locationId === 'allOthers') {
-      return jobLevelStatus;
-    }
-
+    if (locationId === 'allOthers') return jobLevelStatus;
     const locationOverride = jobData.Locations?.[locationId]?.[feature];
-
-    if (typeof locationOverride === 'boolean') {
-      return locationOverride;
-    }
-
+    if (typeof locationOverride === 'boolean') return locationOverride;
     return jobLevelStatus;
   }, [config]);
 
   const getJobTypeAggregateState = useCallback((feature, jobId) => {
-    const gatewayState = getFeatureStateForLocation(feature, jobId, '875790027');
-    const nashvilleState = getFeatureStateForLocation(feature, jobId, '875790032');
-    const allOthersState = getFeatureStateForLocation(feature, jobId, 'allOthers');
-
-    const states = [gatewayState, nashvilleState, allOthersState];
+    const states = [
+      getFeatureStateForLocation(feature, jobId, '875790027'),
+      getFeatureStateForLocation(feature, jobId, '875790032'),
+      getFeatureStateForLocation(feature, jobId, 'allOthers')
+    ];
     const allEnabled = states.every(s => s === true);
     const allDisabled = states.every(s => s === false);
-
     if (allEnabled) return 'enabled';
     if (allDisabled) return 'disabled';
     return 'partial';
@@ -539,7 +258,7 @@ export default function App() {
 
   const handleToggle = (feature, jobId, locationId = null) => {
     setConfig(currentConfig => {
-      const newConfig = JSON.parse(JSON.stringify(currentConfig)); // Deep copy
+      const newConfig = JSON.parse(JSON.stringify(currentConfig));
       const jobData = newConfig[jobId];
       if (!jobData) return currentConfig;
 
@@ -618,8 +337,8 @@ export default function App() {
             </button>
           </div>
 
-          <div className="mb-6 bg-slate-50 p-4 rounded-lg border border-slate-200">
-            <div className="flex items-center gap-3">
+          <div className="mb-6 bg-slate-50 p-4 rounded-lg border border-slate-200 flex flex-wrap gap-4 justify-between items-center">
+            <div className="flex items-center gap-3 flex-grow">
               <input
                 type="text"
                 value={newFeatureName}
@@ -637,6 +356,13 @@ export default function App() {
                 Add Feature
               </button>
             </div>
+            <button
+              onClick={toggleAllJobTypesExpansion}
+              className="flex items-center gap-2 px-4 py-2 bg-slate-600 text-white font-semibold rounded-lg shadow-md hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-opacity-75 transition-all"
+            >
+              <ChevronsDownUp />
+              {areAllExpanded ? 'Collapse All' : 'Expand All'}
+            </button>
           </div>
 
           <div className="overflow-x-auto">
@@ -707,14 +433,14 @@ export default function App() {
 
       {isJsonVisible && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={() => setIsJsonVisible(false)}>
-          <div className="bg-white rounded-lg shadow-2xl max-w-4xl w-full min-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
+          <div className="bg-white rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] min-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
             <div className="p-4 border-b flex justify-between items-center">
               <h2 className="text-xl font-bold">Live JSON Configuration</h2>
               <button onClick={() => setIsJsonVisible(false)} className="text-slate-500 hover:text-slate-800 text-3xl leading-none">&times;</button>
             </div>
             <div className="p-4 overflow-auto flex-grow">
               <textarea
-                className="w-full h-full p-4 rounded-md bg-slate-900 text-slate-100 min-h-[80vh] font-mono text-sm border-slate-700 focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full h-full p-4 rounded-md bg-slate-900 text-slate-100 font-mono text-sm border-slate-700 focus:ring-indigo-500 focus:border-indigo-500 min-h-[80vh]"
                 value={jsonInput}
                 onChange={(e) => setJsonInput(e.target.value)}
                 spellCheck="false"
@@ -764,5 +490,4 @@ export default function App() {
     </div>
   );
 }
-
 
