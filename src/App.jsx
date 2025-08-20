@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 
 // --- Helper Icons ---
@@ -103,13 +104,10 @@ const initialConfig = {
   },
 };
 
-const locationMap = {
+const initialLocationMap = {
   '875790027': 'Gateway',
   '875790032': 'Nashville',
-  'allOthers': 'All Others'
 };
-
-const locationIds = ['875790027', '875790032'];
 
 const getFeaturesFromConfig = (config) => {
   const featureSet = new Set();
@@ -151,12 +149,43 @@ const formatConfigForDisplay = (configObj) => {
 export default function App() {
   const [config, setConfig] = useState(initialConfig);
   const [features, setFeatures] = useState(() => getFeaturesFromConfig(initialConfig));
+  const [locationMap, setLocationMap] = useState(initialLocationMap);
   const [newFeatureName, setNewFeatureName] = useState('');
   const [expandedJobTypes, setExpandedJobTypes] = useState({});
   const [isJsonVisible, setIsJsonVisible] = useState(false);
   const [jsonInput, setJsonInput] = useState('');
   const [jsonError, setJsonError] = useState('');
   const [featureToDelete, setFeatureToDelete] = useState(null);
+
+  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  const [modalMode, setModalMode] = useState(null); // 'jobType' or 'location'
+  const [newItemName, setNewItemName] = useState('');
+  const [newItemId, setNewItemId] = useState('');
+
+  useEffect(() => {
+    const handleMessage = (event) => {
+      if (event.data && event.data.type === 'UPDATE_CONFIG') {
+        console.log('Received config from parent:', event.data.payload);
+        try {
+          setConfig(event.data.payload);
+        } catch (e) {
+          console.error('Failed to parse or set config from parent:', e);
+        }
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
+
+  useEffect(() => {
+    if (window.parent && window.parent !== window) {
+      console.log('Sending updated config to parent:', config);
+      parent.postMessage({ type: 'CONFIG_UPDATED', payload: config }, '*');
+    }
+  }, [config]);
+
+  const locationIds = useMemo(() => Object.keys(locationMap), [locationMap]);
+  const fullLocationMap = useMemo(() => ({ ...locationMap, 'allOthers': 'All Others' }), [locationMap]);
 
   const jobTypes = useMemo(() => {
     return Object.entries(config).map(([jobId, jobData]) => ({
@@ -223,14 +252,47 @@ export default function App() {
   const toggleAllJobTypesExpansion = () => {
     const nextState = !areAllExpanded;
     const newExpandedState = {};
-    jobTypes.forEach(job => {
-      newExpandedState[job.id] = nextState;
-    });
+    jobTypes.forEach(job => newExpandedState[job.id] = nextState);
     setExpandedJobTypes(newExpandedState);
   };
 
   const toggleJobTypeExpansion = (jobId) => {
     setExpandedJobTypes(prev => ({ ...prev, [jobId]: !prev[jobId] }));
+  };
+
+  const handleOpenAddModal = (mode) => {
+    setModalMode(mode);
+    setNewItemId('');
+    setNewItemName('');
+    setIsAddModalVisible(true);
+  };
+
+  const handleSaveNewItem = () => {
+    if (!newItemId.trim() || !newItemName.trim()) return;
+
+    if (modalMode === 'jobType') {
+      setConfig(prev => ({
+        ...prev,
+        [newItemId]: {
+          JobTypeName: newItemName,
+          Locations: locationIds.reduce((acc, locId) => {
+            acc[locId] = { LocationNameText: locationMap[locId] };
+            return acc;
+          }, {})
+        }
+      }));
+    } else if (modalMode === 'location') {
+      setLocationMap(prev => ({ ...prev, [newItemId]: newItemName }));
+      setConfig(prev => {
+        const newConfig = JSON.parse(JSON.stringify(prev));
+        for (const jobId in newConfig) {
+          if (!newConfig[jobId].Locations) newConfig[jobId].Locations = {};
+          newConfig[jobId].Locations[newItemId] = { LocationNameText: newItemName };
+        }
+        return newConfig;
+      });
+    }
+    setIsAddModalVisible(false);
   };
 
   const getFeatureStateForLocation = useCallback((feature, jobId, locationId) => {
@@ -244,17 +306,14 @@ export default function App() {
   }, [config]);
 
   const getJobTypeAggregateState = useCallback((feature, jobId) => {
-    const states = [
-      getFeatureStateForLocation(feature, jobId, '875790027'),
-      getFeatureStateForLocation(feature, jobId, '875790032'),
-      getFeatureStateForLocation(feature, jobId, 'allOthers')
-    ];
-    const allEnabled = states.every(s => s === true);
-    const allDisabled = states.every(s => s === false);
-    if (allEnabled) return 'enabled';
-    if (allDisabled) return 'disabled';
+    const locationStates = locationIds.map(locId => getFeatureStateForLocation(feature, jobId, locId));
+    const allOthersState = getFeatureStateForLocation(feature, jobId, 'allOthers');
+    const allStates = [...locationStates, allOthersState];
+
+    if (allStates.every(s => s === true)) return 'enabled';
+    if (allStates.every(s => s === false)) return 'disabled';
     return 'partial';
-  }, [getFeatureStateForLocation]);
+  }, [config, locationIds, getFeatureStateForLocation]);
 
   const handleToggle = (feature, jobId, locationId = null) => {
     setConfig(currentConfig => {
@@ -338,7 +397,7 @@ export default function App() {
           </div>
 
           <div className="mb-6 bg-slate-50 p-4 rounded-lg border border-slate-200 flex flex-wrap gap-4 justify-between items-center">
-            <div className="flex items-center gap-3 flex-grow">
+            <div className="flex items-center gap-3 flex-grow min-w-[300px]">
               <input
                 type="text"
                 value={newFeatureName}
@@ -356,13 +415,17 @@ export default function App() {
                 Add Feature
               </button>
             </div>
-            <button
-              onClick={toggleAllJobTypesExpansion}
-              className="flex items-center gap-2 px-4 py-2 bg-slate-600 text-white font-semibold rounded-lg shadow-md hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-opacity-75 transition-all"
-            >
-              <ChevronsDownUp />
-              {areAllExpanded ? 'Collapse All' : 'Expand All'}
-            </button>
+            <div className="flex items-center gap-3">
+              <button onClick={() => handleOpenAddModal('jobType')} className="px-4 py-2 bg-cyan-600 text-white font-semibold rounded-lg shadow-md hover:bg-cyan-700">Add Job Type</button>
+              <button onClick={() => handleOpenAddModal('location')} className="px-4 py-2 bg-cyan-600 text-white font-semibold rounded-lg shadow-md hover:bg-cyan-700">Add Location</button>
+              <button
+                onClick={toggleAllJobTypesExpansion}
+                className="flex items-center gap-2 px-4 py-2 bg-slate-600 text-white font-semibold rounded-lg shadow-md hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-opacity-75 transition-all"
+              >
+                <ChevronsDownUp />
+                {areAllExpanded ? 'Collapse All' : 'Expand All'}
+              </button>
+            </div>
           </div>
 
           <div className="overflow-x-auto">
@@ -371,7 +434,7 @@ export default function App() {
                 <tr>
                   <th className="p-3 border border-slate-300 text-left font-semibold text-slate-600 w-1/4">Feature Name</th>
                   {jobTypes.map(job => (
-                    <th key={job.id} className="p-3 border border-slate-300 font-semibold text-slate-600" colSpan={expandedJobTypes[job.id] ? 3 : 1}>
+                    <th key={job.id} className="p-3 border border-slate-300 font-semibold text-slate-600" colSpan={expandedJobTypes[job.id] ? (locationIds.length + 1) : 1}>
                       <div className="flex items-center justify-center space-x-2">
                         <span>{job.name}</span>
                         <button onClick={() => toggleJobTypeExpansion(job.id)} className="p-1 rounded-full hover:bg-slate-200">
@@ -385,7 +448,7 @@ export default function App() {
                   <th className="p-2 border border-slate-300 bg-slate-100"></th>
                   {jobTypes.map(job => {
                     if (expandedJobTypes[job.id]) {
-                      return Object.entries(locationMap).map(([id, name]) => (
+                      return Object.entries(fullLocationMap).map(([id, name]) => (
                         <th key={`${job.id}-${id}`} className="p-2 border border-slate-300 font-medium bg-slate-50 text-slate-500 text-sm">{name}</th>
                       ));
                     }
@@ -407,7 +470,7 @@ export default function App() {
                     </td>
                     {jobTypes.map(job => {
                       if (expandedJobTypes[job.id]) {
-                        return Object.keys(locationMap).map(locId => (
+                        return Object.keys(fullLocationMap).map(locId => (
                           <Cell
                             key={`${feature}-${job.id}-${locId}`}
                             state={getFeatureStateForLocation(feature, job.id, locId) ? 'enabled' : 'disabled'}
@@ -483,6 +546,30 @@ export default function App() {
                 className="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400">
                 Delete Feature
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isAddModalVisible && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-2xl max-w-md w-full" onClick={e => e.stopPropagation()}>
+            <div className="p-6">
+              <h3 className="text-lg font-bold text-slate-800">Add New {modalMode === 'jobType' ? 'Job Type' : 'Location'}</h3>
+              <div className="mt-4 space-y-4">
+                <div>
+                  <label htmlFor="itemName" className="block text-sm font-medium text-slate-700">Name</label>
+                  <input type="text" id="itemName" value={newItemName} onChange={e => setNewItemName(e.target.value)} className="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                </div>
+                <div>
+                  <label htmlFor="itemId" className="block text-sm font-medium text-slate-700">ID / Value</label>
+                  <input type="text" id="itemId" value={newItemId} onChange={e => setNewItemId(e.target.value)} className="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                </div>
+              </div>
+            </div>
+            <div className="px-6 py-4 bg-slate-50 rounded-b-lg flex justify-end items-center gap-4">
+              <button onClick={() => setIsAddModalVisible(false)} className="px-4 py-2 bg-slate-200 text-slate-800 font-semibold rounded-lg hover:bg-slate-300">Cancel</button>
+              <button onClick={handleSaveNewItem} className="px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700">Save</button>
             </div>
           </div>
         </div>
