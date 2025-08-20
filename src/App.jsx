@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 
 // --- Helper Icons ---
@@ -161,6 +160,8 @@ export default function App() {
   const [modalMode, setModalMode] = useState(null); // 'jobType' or 'location'
   const [newItemName, setNewItemName] = useState('');
   const [newItemId, setNewItemId] = useState('');
+  const [hasReceivedInitialConfig, setHasReceivedInitialConfig] = useState(false);
+
 
   useEffect(() => {
     const handleMessage = (event) => {
@@ -168,21 +169,29 @@ export default function App() {
         console.log('Received config from parent:', event.data.payload);
         try {
           setConfig(event.data.payload);
+          setHasReceivedInitialConfig(true);
         } catch (e) {
           console.error('Failed to parse or set config from parent:', e);
         }
       }
     };
     window.addEventListener('message', handleMessage);
+
+    // Notify the parent window that the iframe is ready to receive the config
+    if (window.parent && window.parent !== window) {
+      console.log('Iframe is ready, notifying parent.');
+      parent.postMessage({ type: 'IFRAME_READY' }, '*');
+    }
+
     return () => window.removeEventListener('message', handleMessage);
   }, []);
 
   useEffect(() => {
-    if (window.parent && window.parent !== window) {
+    if (hasReceivedInitialConfig && window.parent && window.parent !== window) {
       console.log('Sending updated config to parent:', config);
       parent.postMessage({ type: 'CONFIG_UPDATED', payload: config }, '*');
     }
-  }, [config]);
+  }, [config, hasReceivedInitialConfig]);
 
   const locationIds = useMemo(() => Object.keys(locationMap), [locationMap]);
   const fullLocationMap = useMemo(() => ({ ...locationMap, 'allOthers': 'All Others' }), [locationMap]);
