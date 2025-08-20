@@ -1,0 +1,9 @@
+services:
+  feature-config-ui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: feature_config_ui_container
+    ports:
+      - "8080:80"
+    restart: unless-stopped
